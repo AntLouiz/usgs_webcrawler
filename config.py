@@ -1,8 +1,7 @@
-import os.path
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from settings import BASE_DIR as base_dir
 
-base_dir = os.path.abspath('./')
 profile = webdriver.FirefoxProfile()
 profile.set_preference('browser.download.folderList', 2)
 profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'image/jpeg')
