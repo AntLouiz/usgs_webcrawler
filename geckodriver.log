@@ -1649,3 +1649,19 @@ console.error: BroadcastService:
 
 
 (firefox:10977): GLib-GObject-CRITICAL **: 11:17:56.172: g_object_get: assertion 'G_IS_OBJECT (object)' failed
+1545670501629	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.D47QpWtoAUsN"
+*** You are running in headless mode.
+1545670503481	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid host permission: resource://pdf.js/
+1545670503483	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid host permission: about:reader*
+1545670511462	Marionette	INFO	Listening on port 34147
+1545670511525	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.error: BroadcastService: 
+  receivedBroadcastMessage: handler for
+  remote-settings/monitor_changes
+  threw error:
+  Message: Error: Polling for changes failed: NetworkError when attempting to fetch resource..
+  Stack:
+    remoteSettingsFunction/remoteSettings.pollChanges@resource://services-settings/remote-settings.js:750:13
+
+
+(firefox:19573): GLib-GObject-CRITICAL **: 13:55:50.310: g_object_get: assertion 'G_IS_OBJECT (object)' failed
