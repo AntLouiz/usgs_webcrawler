@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.firefox.options import Options
 
 
 def make_login(driver, credentials):
@@ -46,7 +47,10 @@ profile.set_preference('browser.download.folderList', 2)
 profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'image/jpeg')
 profile.set_preference('browser.download.dir', base_dir)
 
-driver = webdriver.Firefox(firefox_profile=profile)
+options = Options()
+options.set_headless(True)
+
+driver = webdriver.Firefox(firefox_profile=profile, options=options)
 
 response = driver.get(url)
 coordinate_button = driver.find_element_by_xpath("//div[@id='lat_lon_section']/label[2]")
