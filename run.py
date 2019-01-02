@@ -40,7 +40,7 @@ def run_webcrawler():
 
     response = client.get(base_url)
 
-    wait(client, 20).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div.ui-dialog:nth-child(17) > div:nth-child(3) > div:nth-child(1) > button:nth-child(1)"))).click()
+    wait(client, 20).until(EC.visibility_of_element_located((By.XPATH, "/html/body/div[9]/div[1]/button"))).click()
 
     coordinate_button = client.find_element_by_xpath("//div[@id='lat_lon_section']/label[2]")
     coordinate_button.click()
