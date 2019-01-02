@@ -5,7 +5,7 @@ from settings import HEADLESS
 
 profile = webdriver.FirefoxProfile()
 profile.set_preference('browser.download.folderList', 2)
-profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'image/jpeg')
+profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'application/zip')
 profile.set_preference('browser.download.dir', base_dir)
 
 options = Options()
