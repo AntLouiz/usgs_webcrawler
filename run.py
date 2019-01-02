@@ -1,28 +1,26 @@
-import os.path
-import requests
-import re
-import urllib.request
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.firefox.options import Options
+from settings import BASE_URL as base_url
+from settings import USGS_PASSWORD as password
+from settings import USGS_USERNAME as username
+from config import client
+from selenium.webdriver.support.ui import WebDriverWait as wait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 
-def make_login(driver, credentials):
-    input_username = driver.find_element_by_xpath("//input[@id='username']")
+def make_login(client, credentials):
+    input_username = client.find_element_by_xpath("//input[@id='username']")
     input_username.send_keys(credentials['username'])
 
-    input_password = driver.find_element_by_xpath("//input[@id='password']")
+    input_password = client.find_element_by_xpath("//input[@id='password']")
     input_password.send_keys(credentials['password'])
 
-    driver.find_element_by_xpath("//input[@id='loginButton']").click()
+    client.find_element_by_xpath("//input[@id='loginButton']").click()
 
-    driver.implicitly_wait(10)
+    client.implicitly_wait(10)
 
 
-def download_image(driver):
-    driver.find_element_by_xpath(
+def download_image(client):
+    client.find_element_by_xpath(
         "(//td[@class='resultRowContent']//a[@class='download'])[1]"
     ).click()
 
@@ -36,40 +34,31 @@ coordinates = {
 }
 
 credentials = {
-    'username': '****',
-    'password': '****'
+    'username': username,
+    'password': password
 }
 
-url = 'https://earthexplorer.usgs.gov/'
-base_dir = os.path.abspath('./')
-profile = webdriver.FirefoxProfile()
-profile.set_preference('browser.download.folderList', 2)
-profile.set_preference('browser.helperApps.neverAsk.saveToDisk', 'image/jpeg')
-profile.set_preference('browser.download.dir', base_dir)
+response = client.get(base_url)
 
-options = Options()
-options.set_headless(True)
+wait(client, 20).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div.ui-dialog:nth-child(17) > div:nth-child(3) > div:nth-child(1) > button:nth-child(1)"))).click()
 
-driver = webdriver.Firefox(firefox_profile=profile, options=options)
-
-response = driver.get(url)
-coordinate_button = driver.find_element_by_xpath("//div[@id='lat_lon_section']/label[2]")
+coordinate_button = client.find_element_by_xpath("//div[@id='lat_lon_section']/label[2]")
 coordinate_button.click()
 
 
-driver.find_element_by_xpath(
+client.find_element_by_xpath(
     "//input[@id='coordEntryAdd']"
 ).click()
 
-input_lat = driver.find_element_by_xpath(
+input_lat = client.find_element_by_xpath(
     "//div[@aria-describedby='coordEntryDialogArea']//input[@class='latitude txtbox decimalBox']"
 )
 
-input_long = driver.find_element_by_xpath(
+input_long = client.find_element_by_xpath(
     "//div[@aria-describedby='coordEntryDialogArea']//input[@class='longitude txtbox decimalBox']"
 )
 
-driver.implicitly_wait(2)
+client.implicitly_wait(2)
 
 input_lat.send_keys(
     str(coordinates['lat'])
@@ -79,47 +68,47 @@ input_long.send_keys(
     str(coordinates['long'])
 )
 
-driver.find_element_by_xpath(
+client.find_element_by_xpath(
     "//div[@id='coordEntryDialogArea']/..//span[text()='Add']"
 ).click()
 
-driver.implicitly_wait(2)
+client.implicitly_wait(2)
 
-driver.find_element_by_xpath(
+client.find_element_by_xpath(
     "//input[@value='Data Sets »']"
 ).click()
 
-driver.implicitly_wait(5)
+client.implicitly_wait(5)
 
-driver.find_element_by_xpath("//li[@id='cat_210']/div").click()
+client.find_element_by_xpath("//li[@id='cat_210']/div").click()
 
-driver.find_element_by_xpath(
+client.find_element_by_xpath(
     "//span[@title='Landsat Collection 1 Standard Level-1 Scene Products']"
 ).click()
 
-driver.find_element_by_xpath(
+client.find_element_by_xpath(
     "//input[@id='coll_12864']"
 ).click()
 
-driver.find_element_by_xpath(
+client.find_element_by_xpath(
     "//form[@name='dataSetForm']//input[@value='Results »']"
 ).click()
 
-download_image(driver)
+download_image(client)
 
-login_button = driver.find_element_by_xpath("//input[@value='Login']")
+login_button = client.find_element_by_xpath("//input[@value='Login']")
 
 if login_button:
     login_button.click()
 
-    driver.implicitly_wait(10)
+    client.implicitly_wait(10)
 
-    make_login(driver, credentials)
-    download_image(driver)
+    make_login(client, credentials)
+    download_image(client)
 
 
-download_button = driver.find_element_by_xpath(
-    "//input[@value='Download'][1]"
+download_button = client.find_element_by_xpath(
+    "//*[@id='optionsPage']/div[1]/div[4]/input"
 )
 
 download_button.click()
