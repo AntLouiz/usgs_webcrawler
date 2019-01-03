@@ -1,10 +1,19 @@
+import glob
+import time
+import os.path
+from datetime import datetime
 from settings import BASE_URL as base_url
 from settings import USGS_PASSWORD as password
 from settings import USGS_USERNAME as username
-from config import client
+from settings import TEMP_DIR
+from selenium import webdriver
+from config import profile, options
 from selenium.webdriver.support.ui import WebDriverWait as wait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from unzipper import clean_file
+from exceptions import TimeoutError, WebCrawlerError
+from config import download_dir, temp_dir
 
 
 def make_login(client, credentials):
@@ -25,90 +34,143 @@ def download_image(client):
     ).click()
 
 
-"""
-Coordenadas de Parnaíba:
-"""
-coordinates = {
-    'lat': -2.9055,
-    'long': -41.7734
-}
+def check_zip_download_finished(download_dir):
+    waiting_seconds = 0
+    download_finished = False
 
-credentials = {
-    'username': username,
-    'password': password
-}
+    time.sleep(waiting_seconds)
 
-response = client.get(base_url)
+    while not download_finished:
+        time.sleep(1)
+        try:
+            glob.glob("{}*.zip.part".format(download_dir))[0]
+            download_finished = False
 
-wait(client, 20).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div.ui-dialog:nth-child(17) > div:nth-child(3) > div:nth-child(1) > button:nth-child(1)"))).click()
+        except IndexError:
+            download_finished = True
 
-coordinate_button = client.find_element_by_xpath("//div[@id='lat_lon_section']/label[2]")
-coordinate_button.click()
+    if not download_finished:
+        raise TimeoutError('The download is not finished.')
+
+    time.sleep(waiting_seconds)
+
+    return download_finished
 
 
-client.find_element_by_xpath(
-    "//input[@id='coordEntryAdd']"
-).click()
+def run_webcrawler():
 
-input_lat = client.find_element_by_xpath(
-    "//div[@aria-describedby='coordEntryDialogArea']//input[@class='latitude txtbox decimalBox']"
-)
+    # Coordenadas de Parnaíba:
+    coordinates = {
+        'lat': -2.9055,
+        'long': -41.7734
+    }
 
-input_long = client.find_element_by_xpath(
-    "//div[@aria-describedby='coordEntryDialogArea']//input[@class='longitude txtbox decimalBox']"
-)
+    credentials = {
+        'username': username,
+        'password': password
+    }
 
-client.implicitly_wait(2)
+    client = webdriver.Firefox(firefox_profile=profile, options=options)
 
-input_lat.send_keys(
-    str(coordinates['lat'])
-)
 
-input_long.send_keys(
-    str(coordinates['long'])
-)
+    response = client.get(base_url)
 
-client.find_element_by_xpath(
-    "//div[@id='coordEntryDialogArea']/..//span[text()='Add']"
-).click()
+    wait(client, 20).until(EC.visibility_of_element_located((By.XPATH, "/html/body/div[9]/div[1]/button"))).click()
 
-client.implicitly_wait(2)
+    coordinate_button = client.find_element_by_xpath("//div[@id='lat_lon_section']/label[2]")
+    coordinate_button.click()
 
-client.find_element_by_xpath(
-    "//input[@value='Data Sets »']"
-).click()
 
-client.implicitly_wait(5)
+    client.find_element_by_xpath(
+        "//input[@id='coordEntryAdd']"
+    ).click()
 
-client.find_element_by_xpath("//li[@id='cat_210']/div").click()
+    input_lat = client.find_element_by_xpath(
+        "//div[@aria-describedby='coordEntryDialogArea']//input[@class='latitude txtbox decimalBox']"
+    )
 
-client.find_element_by_xpath(
-    "//span[@title='Landsat Collection 1 Standard Level-1 Scene Products']"
-).click()
+    input_long = client.find_element_by_xpath(
+        "//div[@aria-describedby='coordEntryDialogArea']//input[@class='longitude txtbox decimalBox']"
+    )
 
-client.find_element_by_xpath(
-    "//input[@id='coll_12864']"
-).click()
+    client.implicitly_wait(2)
 
-client.find_element_by_xpath(
-    "//form[@name='dataSetForm']//input[@value='Results »']"
-).click()
+    input_lat.send_keys(
+        str(coordinates['lat'])
+    )
 
-download_image(client)
+    input_long.send_keys(
+        str(coordinates['long'])
+    )
 
-login_button = client.find_element_by_xpath("//input[@value='Login']")
+    client.find_element_by_xpath(
+        "//div[@id='coordEntryDialogArea']/..//span[text()='Add']"
+    ).click()
 
-if login_button:
-    login_button.click()
+    client.implicitly_wait(2)
 
-    client.implicitly_wait(10)
+    client.find_element_by_xpath(
+        "//input[@value='Data Sets »']"
+    ).click()
 
-    make_login(client, credentials)
+    client.implicitly_wait(5)
+
+    client.find_element_by_xpath("//li[@id='cat_210']/div").click()
+
+    client.find_element_by_xpath(
+        "//span[@title='Landsat Collection 1 Standard Level-1 Scene Products']"
+    ).click()
+
+    client.find_element_by_xpath(
+        "//input[@id='coll_12864']"
+    ).click()
+
+    client.find_element_by_xpath(
+        "//form[@name='dataSetForm']//input[@value='Results »']"
+    ).click()
+
     download_image(client)
 
+    login_button = client.find_element_by_xpath("//input[@value='Login']")
 
-download_button = client.find_element_by_xpath(
-    "//*[@id='optionsPage']/div[1]/div[4]/input"
-)
+    if login_button:
+        login_button.click()
 
-download_button.click()
+        client.implicitly_wait(10)
+
+        make_login(client, credentials)
+        download_image(client)
+
+
+    download_button = client.find_element_by_xpath(
+        "//*[@id='optionsPage']/div[1]/div[4]/input"
+    )
+
+    download_button.click()
+
+
+if __name__ == '__main__':
+
+    try:
+        run_webcrawler()
+        try:
+            check_zip_download_finished(temp_dir)
+
+            downloaded_file = glob.glob("./{}*.zip".format(TEMP_DIR))[0]
+
+            download_file_path = os.path.join(
+                    download_dir,
+                    str(datetime.now())
+            )
+
+            clean_file(
+                downloaded_file,
+                download_file_path
+            )
+
+        except TimeoutError:
+            print("Timeout error on the image download.")
+
+
+    except WebCrawlerError:
+        print("WebCrawler Error")
