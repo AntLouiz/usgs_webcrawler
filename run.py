@@ -11,8 +11,9 @@ from config import profile, options
 from selenium.webdriver.support.ui import WebDriverWait as wait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException
 from unzipper import clean_file
-from exceptions import TimeoutError, WebCrawlerError
+from exceptions import TimeoutError, WebCrawlerError, ResultsNotFoundError
 from config import download_dir, temp_dir
 
 
@@ -29,9 +30,14 @@ def make_login(client, credentials):
 
 
 def download_image(client):
-    client.find_element_by_xpath(
-        "(//td[@class='resultRowContent']//a[@class='download'])[1]"
-    ).click()
+
+    try:
+        client.find_element_by_xpath(
+            "(//td[@class='resultRowContent']//a[@class='download'])[1]"
+        ).click()
+
+    except NoSuchElementException:
+        raise ResultsNotFoundError('No results found.')
 
 
 def check_zip_download_finished(download_dir):
@@ -61,8 +67,8 @@ def run_webcrawler():
 
     # Coordenadas de Parnaíba:
     coordinates = {
-        'lat': -2.9055,
-        'long': -41.7734
+        'lat': -9.4753,
+        'long': -12.6328
     }
 
     credentials = {
