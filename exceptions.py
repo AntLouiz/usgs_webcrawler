@@ -4,3 +4,6 @@ class TimeoutError(Exception):
 
 class WebCrawlerError(Exception):
     pass
+
+class ResultsNotFoundError(Exception):
+    pass
