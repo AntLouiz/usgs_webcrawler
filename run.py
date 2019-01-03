@@ -1,5 +1,6 @@
 import glob
 import time
+import os.path
 from datetime import datetime
 from settings import BASE_URL as base_url
 from settings import USGS_PASSWORD as password
@@ -12,6 +13,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from unzipper import clean_file
 from exceptions import TimeoutError
+from config import download_dir, temp_dir
 
 
 def make_login(client, credentials):
@@ -33,7 +35,7 @@ def download_image(client):
 
 
 def check_zip_download_finished(download_dir):
-    waiting_seconds = 5
+    waiting_seconds = 0
     download_finished = False
 
     time.sleep(waiting_seconds)
@@ -41,7 +43,9 @@ def check_zip_download_finished(download_dir):
     while not download_finished:
         time.sleep(1)
         try:
-            glob.glob("{}/*.zip.part".format(download_dir))[-1]
+            print("TRY")
+            print(download_dir)
+            glob.glob("{}*.zip.part".format(download_dir))[0]
             download_finished = False
 
         except IndexError:
@@ -150,15 +154,18 @@ def run_webcrawler():
 if __name__ == '__main__':
     run_webcrawler()
     try:
-        check_zip_download_finished(TEMP_DIR)
+        check_zip_download_finished(temp_dir)
 
-        all_downloaded_files = glob.glob("./{}*.zip".format(TEMP_DIR))
+        downloaded_file = glob.glob("./{}*.zip".format(TEMP_DIR))[0]
+
+        download_file_path = os.path.join(
+                download_dir,
+                str(datetime.now())
+        )
+
         clean_file(
-            all_downloaded_files[-1],
-            './{}{}'.format(
-                TEMP_DIR,
-                datetime.now()
-            )
+            downloaded_file,
+            download_file_path
         )
 
     except TimeoutError:
