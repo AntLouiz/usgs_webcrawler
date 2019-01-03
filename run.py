@@ -43,8 +43,6 @@ def check_zip_download_finished(download_dir):
     while not download_finished:
         time.sleep(1)
         try:
-            print("TRY")
-            print(download_dir)
             glob.glob("{}*.zip.part".format(download_dir))[0]
             download_finished = False
 
