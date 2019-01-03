@@ -12,7 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait as wait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from unzipper import clean_file
-from exceptions import TimeoutError
+from exceptions import TimeoutError, WebCrawlerError
 from config import download_dir, temp_dir
 
 
@@ -152,21 +152,27 @@ def run_webcrawler():
 
 
 if __name__ == '__main__':
-    run_webcrawler()
+
     try:
-        check_zip_download_finished(temp_dir)
+        run_webcrawler()
+        try:
+            check_zip_download_finished(temp_dir)
 
-        downloaded_file = glob.glob("./{}*.zip".format(TEMP_DIR))[0]
+            downloaded_file = glob.glob("./{}*.zip".format(TEMP_DIR))[0]
 
-        download_file_path = os.path.join(
-                download_dir,
-                str(datetime.now())
-        )
+            download_file_path = os.path.join(
+                    download_dir,
+                    str(datetime.now())
+            )
 
-        clean_file(
-            downloaded_file,
-            download_file_path
-        )
+            clean_file(
+                downloaded_file,
+                download_file_path
+            )
 
-    except TimeoutError:
-        print("Timeout error on the image download.")
+        except TimeoutError:
+            print("Timeout error on the image download.")
+
+
+    except WebCrawlerError:
+        print("WebCrawler Error")
