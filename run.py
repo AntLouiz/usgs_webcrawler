@@ -1,10 +1,17 @@
+import glob
+import time
+from datetime import datetime
 from settings import BASE_URL as base_url
 from settings import USGS_PASSWORD as password
 from settings import USGS_USERNAME as username
-from config import client
+from settings import TEMP_DIR
+from selenium import webdriver
+from config import profile, options
 from selenium.webdriver.support.ui import WebDriverWait as wait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
+from unzipper import clean_file
+from exceptions import TimeoutError
 
 
 def make_login(client, credentials):
@@ -25,6 +32,29 @@ def download_image(client):
     ).click()
 
 
+def check_zip_download_finished(download_dir):
+    waiting_seconds = 5
+    download_finished = False
+
+    time.sleep(waiting_seconds)
+
+    while not download_finished:
+        time.sleep(1)
+        try:
+            glob.glob("{}/*.zip.part".format(download_dir))[-1]
+            download_finished = False
+
+        except IndexError:
+            download_finished = True
+
+    if not download_finished:
+        raise TimeoutError('The download is not finished.')
+
+    time.sleep(waiting_seconds)
+
+    return download_finished
+
+
 def run_webcrawler():
 
     # Coordenadas de Parnaíba:
@@ -37,6 +67,9 @@ def run_webcrawler():
         'username': username,
         'password': password
     }
+
+    client = webdriver.Firefox(firefox_profile=profile, options=options)
+
 
     response = client.get(base_url)
 
@@ -116,3 +149,17 @@ def run_webcrawler():
 
 if __name__ == '__main__':
     run_webcrawler()
+    try:
+        check_zip_download_finished(TEMP_DIR)
+
+        all_downloaded_files = glob.glob("./{}*.zip".format(TEMP_DIR))
+        clean_file(
+            all_downloaded_files[-1],
+            './{}{}'.format(
+                TEMP_DIR,
+                datetime.now()
+            )
+        )
+
+    except TimeoutError:
+        print("Timeout error on the image download.")
