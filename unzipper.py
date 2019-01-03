@@ -1,7 +1,6 @@
 import zipfile
 import glob
 import os
-from datetime import datetime
 
 
 def clean_file(file_path, extract_dir='./'):
@@ -16,9 +15,4 @@ def clean_file(file_path, extract_dir='./'):
     for file in files_to_exclude:
         os.remove(file)
 
-
-if __name__ == '__main__':
-    clean_file(
-        './download/LC08_L1TP_219062_20181220_20181227_01_T1.zip',
-        './download/{}'.format(datetime.now())
-    )
+    os.remove(file_path)
