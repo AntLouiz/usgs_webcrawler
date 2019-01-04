@@ -12,6 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from decompressor import clean_file, check_zip_download_finished
+from uploader import upload_file
 from exceptions import TimeoutError, WebCrawlerError, ResultsNotFoundError
 from config import download_dir, temp_dir
 
@@ -145,6 +146,16 @@ def get_landsat_image():
             clean_file(
                 downloaded_file,
                 download_file_path
+            )
+
+            upload_filename = "{}.tif".format(str(datetime.now()))
+            upload_file_path = glob.glob("{}/*.tif".format(
+                download_file_path
+            ))[0]
+
+            upload_file(
+                upload_filename,
+                upload_file_path
             )
 
         except TimeoutError:

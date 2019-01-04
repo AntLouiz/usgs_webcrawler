@@ -33,6 +33,9 @@ MANIFEST
 pip-log.txt
 pip-delete-this-directory.txt
 
+# Google Drive secrets
+client_secrets.json
+
 # Unit test / coverage reports
 htmlcov/
 .tox/
