@@ -1,5 +1,4 @@
 import glob
-import time
 import os.path
 from datetime import datetime
 from settings import BASE_URL as base_url
@@ -12,7 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait as wait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
-from unzipper import clean_file
+from unzipper import clean_file, check_zip_download_finished
 from exceptions import TimeoutError, WebCrawlerError, ResultsNotFoundError
 from config import download_dir, temp_dir
 
@@ -38,29 +37,6 @@ def download_image(client):
 
     except NoSuchElementException:
         raise ResultsNotFoundError('No results found.')
-
-
-def check_zip_download_finished(download_dir):
-    waiting_seconds = 0
-    download_finished = False
-
-    time.sleep(waiting_seconds)
-
-    while not download_finished:
-        time.sleep(1)
-        try:
-            glob.glob("{}*.zip.part".format(download_dir))[0]
-            download_finished = False
-
-        except IndexError:
-            download_finished = True
-
-    if not download_finished:
-        raise TimeoutError('The download is not finished.')
-
-    time.sleep(waiting_seconds)
-
-    return download_finished
 
 
 def crawl():

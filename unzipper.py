@@ -1,6 +1,8 @@
 import zipfile
 import glob
 import os
+import time
+from exceptions import TimeoutError
 
 
 def clean_file(file_path, output_dir='./'):
@@ -16,3 +18,26 @@ def clean_file(file_path, output_dir='./'):
         os.remove(file)
 
     os.remove(file_path)
+
+
+def check_zip_download_finished(download_dir):
+    waiting_seconds = 0
+    download_finished = False
+
+    time.sleep(waiting_seconds)
+
+    while not download_finished:
+        time.sleep(1)
+        try:
+            glob.glob("{}*.zip.part".format(download_dir))[0]
+            download_finished = False
+
+        except IndexError:
+            download_finished = True
+
+    if not download_finished:
+        raise TimeoutError('The download is not finished.')
+
+    time.sleep(waiting_seconds)
+
+    return download_finished
