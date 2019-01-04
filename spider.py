@@ -154,7 +154,7 @@ def get_landsat_image():
                 download_file_path
             ))[0]
 
-            shapefile_path = '/home/antlouiz/Workspace/usgs_crawler/parnaiba.shp'
+            shapefile_path = '/home/antlouiz/Workspace/usgs_crawler/shapefile_sample/sample.shp'
 
             crop_raster(
                 upload_file_path,
