@@ -13,6 +13,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from decompressor import clean_file, check_zip_download_finished
 from uploader import upload_file
+from trimmer import crop_raster
 from exceptions import TimeoutError, WebCrawlerError, ResultsNotFoundError
 from config import download_dir, temp_dir
 
@@ -152,6 +153,14 @@ def get_landsat_image():
             upload_file_path = glob.glob("{}/*.tif".format(
                 download_file_path
             ))[0]
+
+            shapefile_path = '/home/antlouiz/Workspace/usgs_crawler/parnaiba.shp'
+
+            crop_raster(
+                upload_file_path,
+                shapefile_path,
+                upload_file_path
+            )
 
             upload_file(
                 upload_filename,
