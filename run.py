@@ -63,12 +63,12 @@ def check_zip_download_finished(download_dir):
     return download_finished
 
 
-def run_webcrawler():
+def crawl():
 
     # Coordenadas de Parnaíba:
     coordinates = {
-        'lat': -9.4753,
-        'long': -12.6328
+        'lat': -2.9055,
+        'long': -41.7734
     }
 
     credentials = {
@@ -77,7 +77,6 @@ def run_webcrawler():
     }
 
     client = webdriver.Firefox(firefox_profile=profile, options=options)
-
 
     response = client.get(base_url)
 
@@ -147,7 +146,6 @@ def run_webcrawler():
         make_login(client, credentials)
         download_image(client)
 
-
     download_button = client.find_element_by_xpath(
         "//*[@id='optionsPage']/div[1]/div[4]/input"
     )
@@ -155,18 +153,17 @@ def run_webcrawler():
     download_button.click()
 
 
-if __name__ == '__main__':
-
+def get_landsat_image():
     try:
-        run_webcrawler()
+        crawl()
         try:
             check_zip_download_finished(temp_dir)
 
             downloaded_file = glob.glob("./{}*.zip".format(TEMP_DIR))[0]
 
             download_file_path = os.path.join(
-                    download_dir,
-                    str(datetime.now())
+                download_dir,
+                str(datetime.now())
             )
 
             clean_file(
@@ -177,6 +174,9 @@ if __name__ == '__main__':
         except TimeoutError:
             print("Timeout error on the image download.")
 
-
     except WebCrawlerError:
         print("WebCrawler Error")
+
+
+if __name__ == '__main__':
+    get_landsat_image()
