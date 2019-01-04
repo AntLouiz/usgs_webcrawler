@@ -7,7 +7,6 @@ gdal.UseExceptions()
 def crop_raster(raster_path, shapefile_path, outfile='./clipped.tif'):
     raster_exists = os.path.exists(raster_path)
     shapefile_exists = os.path.exists(shapefile_path)
-    print(raster_exists, shapefile_exists)
 
     if ((not raster_exists) or (not shapefile_exists)):
         raise Exception('Insert the real files path.')
@@ -19,8 +18,7 @@ def crop_raster(raster_path, shapefile_path, outfile='./clipped.tif'):
         cutlineDSName=shapefile_path,
         cropToCutline=True
     )
-    print(result)
     if result:
-        print("Done")
+        print("Imagem Cropped")
     else:
         raise Exception("Error")
