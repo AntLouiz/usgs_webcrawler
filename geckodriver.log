@@ -2701,3 +2701,47 @@ console.error: BroadcastService:
 
 
 (firefox:16854): GLib-GObject-CRITICAL **: 11:48:51.222: g_object_get: assertion 'G_IS_OBJECT (object)' failed
+1546613784146	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.5W4DksDakSN5"
+*** You are running in headless mode.
+1546613787882	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid host permission: resource://pdf.js/
+1546613787899	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid host permission: about:reader*
+1546613802801	Marionette	INFO	Listening on port 41917
+1546613803208	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.error: BroadcastService: 
+  receivedBroadcastMessage: handler for
+  remote-settings/monitor_changes
+  threw error:
+  Message: Error: Polling for changes failed: NetworkError when attempting to fetch resource..
+  Stack:
+    remoteSettingsFunction/remoteSettings.pollChanges@resource://services-settings/remote-settings.js:750:13
+
+
+(/usr/lib/firefox/firefox:18017): dconf-WARNING **: 11:57:30.232: Unable to open /var/lib/snapd/desktop/dconf/profile/user: Permission denied
+
+(firefox:17889): GLib-GObject-CRITICAL **: 11:58:40.686: g_object_get: assertion 'G_IS_OBJECT (object)' failed
+console.error: (new Error("Connection closed before committing the transaction.", "resource://gre/modules/Sqlite.jsm", 632))
+1546613987148	Marionette	INFO	Stopped listening on port 41917
+1546613989831	Marionette	INFO	Stopped listening on port 35831
+1546613991228	Marionette	INFO	Stopped listening on port 34729
+1546613991353	Marionette	INFO	Stopped listening on port 33887
+1546613991648	Marionette	INFO	Stopped listening on port 45709
+1546613992476	Marionette	INFO	Stopped listening on port 33651
+1546613992477	Marionette	INFO	Stopped listening on port 34355
+1546613992934	Marionette	INFO	Stopped listening on port 40593
+1546613993111	Marionette	INFO	Stopped listening on port 36825
+1546861086587	mozrunner::runner	INFO	Running command: "/usr/bin/firefox" "-marionette" "-headless" "-foreground" "-no-remote" "-profile" "/tmp/rust_mozprofile.l1MLEX6DstLc"
+*** You are running in headless mode.
+1546861093164	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid host permission: resource://pdf.js/
+1546861093165	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid host permission: about:reader*
+1546861104901	Marionette	INFO	Listening on port 38577
+1546861104967	Marionette	WARN	TLS certificate errors will be ignored for this session
+console.error: BroadcastService: 
+  receivedBroadcastMessage: handler for
+  remote-settings/monitor_changes
+  threw error:
+  Message: Error: Polling for changes failed: NetworkError when attempting to fetch resource..
+  Stack:
+    remoteSettingsFunction/remoteSettings.pollChanges@resource://services-settings/remote-settings.js:750:13
+
+
+(firefox:1484): GLib-GObject-CRITICAL **: 08:39:43.852: g_object_get: assertion 'G_IS_OBJECT (object)' failed

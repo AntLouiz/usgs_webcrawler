@@ -35,6 +35,7 @@ pip-delete-this-directory.txt
 
 # Google Drive secrets
 client_secrets.json
+credentials.txt
 
 # Unit test / coverage reports
 htmlcov/
