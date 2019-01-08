@@ -41,13 +41,7 @@ def download_image(client):
         raise ResultsNotFoundError('No results found.')
 
 
-def crawl():
-
-    # Coordenadas de Parnaíba:
-    coordinates = {
-        'lat': -2.9055,
-        'long': -41.7734
-    }
+def crawl(latitude, longitude):
 
     credentials = {
         'username': username,
@@ -79,11 +73,11 @@ def crawl():
     client.implicitly_wait(2)
 
     input_lat.send_keys(
-        str(coordinates['lat'])
+        str(latitude)
     )
 
     input_long.send_keys(
-        str(coordinates['long'])
+        str(longitude)
     )
 
     client.find_element_by_xpath(
@@ -131,9 +125,9 @@ def crawl():
     download_button.click()
 
 
-def get_landsat_image():
+def get_landsat_image(latitude, longitude, shapefile_path):
     try:
-        crawl()
+        crawl(latitude, longitude)
         try:
             check_zip_download_finished(temp_dir)
 
@@ -154,8 +148,6 @@ def get_landsat_image():
                 download_file_path
             ))[0]
 
-            shapefile_path = '/home/antlouiz/Workspace/usgs_crawler/shapefile_sample/sample.shp'
-
             crop_raster(
                 upload_file_path,
                 shapefile_path,
@@ -172,7 +164,3 @@ def get_landsat_image():
 
     except WebCrawlerError:
         print("WebCrawler Error")
-
-
-if __name__ == '__main__':
-    get_landsat_image()
