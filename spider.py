@@ -16,6 +16,7 @@ from uploader import upload_file
 from trimmer import crop_raster
 from exceptions import TimeoutError, WebCrawlerError, ResultsNotFoundError
 from config import download_dir, temp_dir
+from decompressor import clean_dir
 
 
 def make_login(client, credentials):
@@ -31,7 +32,7 @@ def make_login(client, credentials):
 
 
 def download_image(client):
-
+    print(">>> Trying to download the imagem")
     try:
         client.find_element_by_xpath(
             "(//td[@class='resultRowContent']//a[@class='download'])[1]"
@@ -61,7 +62,7 @@ def crawl(latitude, longitude):
     client.find_element_by_xpath(
         "//input[@id='coordEntryAdd']"
     ).click()
-
+    print(">>> Inserting the latitude and longitude.")
     input_lat = client.find_element_by_xpath(
         "//div[@aria-describedby='coordEntryDialogArea']//input[@class='latitude txtbox decimalBox']"
     )
@@ -85,7 +86,7 @@ def crawl(latitude, longitude):
     ).click()
 
     client.implicitly_wait(2)
-
+    print(">>> Searching the data set")
     client.find_element_by_xpath(
         "//input[@value='Data Sets »']"
     ).click()
@@ -123,6 +124,7 @@ def crawl(latitude, longitude):
     )
 
     download_button.click()
+    print(">>> Downloading the image.")
 
 
 def get_landsat_image(latitude, longitude, shapefile_path):
@@ -130,6 +132,7 @@ def get_landsat_image(latitude, longitude, shapefile_path):
         crawl(latitude, longitude)
         try:
             check_zip_download_finished(temp_dir)
+            print(">>> Download finished.")
 
             downloaded_file = glob.glob("./{}*.zip".format(TEMP_DIR))[0]
 
@@ -138,6 +141,7 @@ def get_landsat_image(latitude, longitude, shapefile_path):
                 str(datetime.now())
             )
 
+            print(">>> Cleaning the file.")
             clean_file(
                 downloaded_file,
                 download_file_path
@@ -148,16 +152,23 @@ def get_landsat_image(latitude, longitude, shapefile_path):
                 download_file_path
             ))[0]
 
+            print(">>> Cropping the raster.")
             crop_raster(
                 upload_file_path,
                 shapefile_path,
                 upload_file_path
             )
 
+            print(">>> Uploading the file.")
             upload_file(
                 upload_filename,
                 upload_file_path
             )
+
+            clean_dir(temp_dir)
+            clean_dir(download_dir)
+
+            print(">>> Finished.")
 
         except TimeoutError:
             print("Timeout error on the image download.")
