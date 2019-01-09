@@ -1,4 +1,5 @@
 import os.path
+import os
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from settings import (
@@ -16,7 +17,15 @@ profile.set_preference(
 )
 
 temp_dir = os.path.join(BASE_DIR, TEMP_DIR)
+
+if not os.path.exists(temp_dir):
+    os.makedirs(temp_dir)
+
 download_dir = os.path.join(BASE_DIR, DOWNLOAD_DIR)
+
+if not os.path.exists(download_dir):
+    os.makedirs(download_dir)
+
 profile.set_preference('browser.download.dir', temp_dir)
 
 
