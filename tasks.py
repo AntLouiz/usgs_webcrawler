@@ -1,6 +1,10 @@
 import json
+import glob
 from celery import Celery
 from spider import get_landsat_image
+from uploader import get_shapefile
+from settings import TEMP_DIR
+from config import temp_dir
 
 
 broker_url = 'amqp://antlouiz:luiz05012016@127.0.0.1:5672/watcher'
@@ -27,10 +31,17 @@ def watch_new_coordinates():
         coordinates = json.load(coordinates)
         for coord in coordinates:
             if not coordinates[coord]['scrapped']:
+                user_id = coordinates[coord]['user_id']
+                get_shapefile(
+                    user_id
+                )
+
+                shapefile_path = glob.glob("./{}*.shp".format(TEMP_DIR))[0]
+
                 get_landsat_image(
                     coordinates[coord]['lat'],
                     coordinates[coord]['long'],
-                    coordinates[coord]['shapefile_link']
+                    shapefile_path
                 )
 
                 coordinates[coord]['scrapped'] = True
