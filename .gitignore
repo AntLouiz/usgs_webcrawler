@@ -35,7 +35,8 @@ pip-delete-this-directory.txt
 
 # Google Drive secrets
 client_secrets.json
-credentials.txt
+credentials.json
+settings.yaml
 
 # Unit test / coverage reports
 htmlcov/
@@ -104,3 +105,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Firefox Driver Logs
+geckodriver.log

@@ -2,12 +2,24 @@ import zipfile
 import glob
 import os
 import time
+import shutil
 from exceptions import TimeoutError
 
 
-def clean_file(file_path, output_dir='./'):
+def clean_dir(dir_path):
+    shutil.rmtree(dir_path)
+    os.mkdir(dir_path)
+
+
+def decompress_zip_file(file_path, output_dir='./'):
     with zipfile.ZipFile(file_path, 'r') as zip_ref:
         zip_ref.extractall(output_dir)
+
+    os.remove(file_path)
+
+
+def clean_file(file_path, output_dir='./'):
+    decompress_zip_file(file_path, output_dir)
 
     tir_file = glob.glob("{}/*TIR.tif".format(output_dir))
     all_files = glob.glob("{}/*.tif".format(output_dir))
@@ -16,8 +28,6 @@ def clean_file(file_path, output_dir='./'):
 
     for file in files_to_exclude:
         os.remove(file)
-
-    os.remove(file_path)
 
 
 def check_zip_download_finished(download_dir):

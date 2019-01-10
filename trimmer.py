@@ -18,7 +18,5 @@ def crop_raster(raster_path, shapefile_path, outfile='./clipped.tif'):
         cutlineDSName=shapefile_path,
         cropToCutline=True
     )
-    if result:
-        print("Imagem Cropped")
-    else:
-        raise Exception("Error")
+    if not result:
+        raise Exception("Error on raster cropping.")

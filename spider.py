@@ -16,6 +16,7 @@ from uploader import upload_file
 from trimmer import crop_raster
 from exceptions import TimeoutError, WebCrawlerError, ResultsNotFoundError
 from config import download_dir, temp_dir
+from decompressor import clean_dir
 
 
 def make_login(client, credentials):
@@ -31,7 +32,7 @@ def make_login(client, credentials):
 
 
 def download_image(client):
-
+    print(">>> Trying to download the imagem")
     try:
         client.find_element_by_xpath(
             "(//td[@class='resultRowContent']//a[@class='download'])[1]"
@@ -41,13 +42,7 @@ def download_image(client):
         raise ResultsNotFoundError('No results found.')
 
 
-def crawl():
-
-    # Coordenadas de Parnaíba:
-    coordinates = {
-        'lat': -2.9055,
-        'long': -41.7734
-    }
+def crawl(latitude, longitude):
 
     credentials = {
         'username': username,
@@ -67,7 +62,7 @@ def crawl():
     client.find_element_by_xpath(
         "//input[@id='coordEntryAdd']"
     ).click()
-
+    print(">>> Inserting the latitude and longitude.")
     input_lat = client.find_element_by_xpath(
         "//div[@aria-describedby='coordEntryDialogArea']//input[@class='latitude txtbox decimalBox']"
     )
@@ -79,11 +74,11 @@ def crawl():
     client.implicitly_wait(2)
 
     input_lat.send_keys(
-        str(coordinates['lat'])
+        str(latitude)
     )
 
     input_long.send_keys(
-        str(coordinates['long'])
+        str(longitude)
     )
 
     client.find_element_by_xpath(
@@ -91,7 +86,7 @@ def crawl():
     ).click()
 
     client.implicitly_wait(2)
-
+    print(">>> Searching the data set")
     client.find_element_by_xpath(
         "//input[@value='Data Sets »']"
     ).click()
@@ -129,13 +124,15 @@ def crawl():
     )
 
     download_button.click()
+    print(">>> Downloading the image.")
 
 
-def get_landsat_image():
+def get_landsat_image(latitude, longitude, shapefile_path):
     try:
-        crawl()
+        crawl(latitude, longitude)
         try:
             check_zip_download_finished(temp_dir)
+            print(">>> Download finished.")
 
             downloaded_file = glob.glob("./{}*.zip".format(TEMP_DIR))[0]
 
@@ -144,6 +141,7 @@ def get_landsat_image():
                 str(datetime.now())
             )
 
+            print(">>> Cleaning the file.")
             clean_file(
                 downloaded_file,
                 download_file_path
@@ -154,25 +152,26 @@ def get_landsat_image():
                 download_file_path
             ))[0]
 
-            shapefile_path = '/home/antlouiz/Workspace/usgs_crawler/shapefile_sample/sample.shp'
-
+            print(">>> Cropping the raster.")
             crop_raster(
                 upload_file_path,
                 shapefile_path,
                 upload_file_path
             )
 
+            print(">>> Uploading the file.")
             upload_file(
                 upload_filename,
                 upload_file_path
             )
+
+            clean_dir(temp_dir)
+            clean_dir(download_dir)
+
+            print(">>> Finished.")
 
         except TimeoutError:
             print("Timeout error on the image download.")
 
     except WebCrawlerError:
         print("WebCrawler Error")
-
-
-if __name__ == '__main__':
-    get_landsat_image()
