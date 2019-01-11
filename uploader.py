@@ -48,8 +48,6 @@ def get_folder_files(folder_id='root'):
 
 def get_shapefile(user_id, download_dir=temp_dir):
     folder_id = get_folder_id('shapefiles')
-    folder_id = get_folder_id(user_id, folder_id)
-
     shapefiles = get_folder_files(folder_id)
 
     if not len(shapefiles):
