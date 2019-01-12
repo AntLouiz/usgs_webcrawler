@@ -132,7 +132,7 @@ def crawl(order_id, latitude, longitude):
     print(">>> Downloading the image.")
 
 
-def get_landsat_image(order, shapefile_path):
+def execute_scraping_order(order, shapefile_path):
     order_id = order['id']
     latitude = order['latitude']
     longitude = order['longitude']

@@ -1,10 +1,9 @@
-import json
 import glob
+import config
 from celery import Celery
-from spider import get_landsat_image
+from spider import execute_scraping_order
 from uploader import get_shapefile
 from settings import TEMP_DIR, BROKER_URL as broker_url
-from config import logger
 from queries import (
     get_scraping_orders,
     update_scraping_order
@@ -40,7 +39,7 @@ def watch_new_coordinates():
 
             shapefile_path = glob.glob("./{}*.shp".format(TEMP_DIR))[0]
 
-            get_landsat_image(
+            execute_scraping_order(
                 order,
                 shapefile_path
             )
