@@ -14,7 +14,7 @@ from selenium.common.exceptions import NoSuchElementException
 from decompressor import clean_file, check_zip_download_finished
 from uploader import upload_file
 from trimmer import crop_raster
-from exceptions import TimeoutError, WebCrawlerError, ResultsNotFoundError
+from exceptions import ResultsNotFoundError
 from config import download_dir, temp_dir
 from decompressor import clean_dir
 from queries import update_scraping_order
@@ -133,54 +133,47 @@ def crawl(order_id, latitude, longitude):
 
 
 def get_landsat_image(order, shapefile_path):
-    try:
-        order_id = order['id']
-        latitude = order['latitude']
-        longitude = order['longitude']
+    order_id = order['id']
+    latitude = order['latitude']
+    longitude = order['longitude']
 
-        crawl(order_id, latitude, longitude)
-        try:
-            check_zip_download_finished(temp_dir)
-            print(">>> Download finished.")
+    crawl(order_id, latitude, longitude)
+    check_zip_download_finished(temp_dir)
 
-            downloaded_file = glob.glob("./{}*.zip".format(TEMP_DIR))[0]
+    print(">>> Download finished.")
 
-            download_file_path = os.path.join(
-                download_dir,
-                str(datetime.now())
-            )
+    downloaded_file = glob.glob("./{}*.zip".format(TEMP_DIR))[0]
 
-            print(">>> Cleaning the file.")
-            clean_file(
-                downloaded_file,
-                download_file_path
-            )
+    download_file_path = os.path.join(
+        download_dir,
+        str(datetime.now())
+    )
 
-            upload_filename = "{}.tif".format(str(datetime.now()))
-            upload_file_path = glob.glob("{}/*.tif".format(
-                download_file_path
-            ))[0]
+    print(">>> Cleaning the file.")
+    clean_file(
+        downloaded_file,
+        download_file_path
+    )
 
-            print(">>> Cropping the raster.")
-            crop_raster(
-                upload_file_path,
-                shapefile_path,
-                upload_file_path
-            )
+    upload_filename = "{}.tif".format(str(datetime.now()))
+    upload_file_path = glob.glob("{}/*.tif".format(
+        download_file_path
+    ))[0]
 
-            print(">>> Uploading the file.")
-            upload_file(
-                upload_filename,
-                upload_file_path
-            )
+    print(">>> Cropping the raster.")
+    crop_raster(
+        upload_file_path,
+        shapefile_path,
+        upload_file_path
+    )
 
-            clean_dir(temp_dir)
-            clean_dir(download_dir)
+    print(">>> Uploading the file.")
+    upload_file(
+        upload_filename,
+        upload_file_path
+    )
 
-            print(">>> Finished.")
+    clean_dir(temp_dir)
+    clean_dir(download_dir)
 
-        except TimeoutError:
-            print("Timeout error on the image download.")
-
-    except WebCrawlerError:
-        print("WebCrawler Error")
+    print(">>> Finished.")
