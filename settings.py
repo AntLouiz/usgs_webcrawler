@@ -11,3 +11,14 @@ DOWNLOAD_DIR = config(
     'DOWNLOAD_DIR',
     default='downloads/'
 )
+
+DB_URL = config(
+    'DATABASE_URL',
+    default='sqlite:///{}'.format(
+        os.path.join(BASE_DIR, 'db.sqlite3')
+    )
+)
+
+BROKER_URL = config(
+    'BROKER_URL'
+)

@@ -17,6 +17,7 @@ from trimmer import crop_raster
 from exceptions import TimeoutError, WebCrawlerError, ResultsNotFoundError
 from config import download_dir, temp_dir
 from decompressor import clean_dir
+from queries import update_scraping_order
 
 
 def make_login(client, credentials):
@@ -31,7 +32,7 @@ def make_login(client, credentials):
     client.implicitly_wait(10)
 
 
-def download_image(client):
+def download_image(order_id, client):
     print(">>> Trying to download the imagem")
     try:
         client.find_element_by_xpath(
@@ -39,10 +40,14 @@ def download_image(client):
         ).click()
 
     except NoSuchElementException:
+        update_scraping_order(
+            order_id,
+            status='no_result'
+        )
         raise ResultsNotFoundError('No results found.')
 
 
-def crawl(latitude, longitude):
+def crawl(order_id, latitude, longitude):
 
     credentials = {
         'username': username,
@@ -107,7 +112,7 @@ def crawl(latitude, longitude):
         "//form[@name='dataSetForm']//input[@value='Results »']"
     ).click()
 
-    download_image(client)
+    download_image(order_id, client)
 
     login_button = client.find_element_by_xpath("//input[@value='Login']")
 
@@ -117,7 +122,7 @@ def crawl(latitude, longitude):
         client.implicitly_wait(10)
 
         make_login(client, credentials)
-        download_image(client)
+        download_image(order_id, client)
 
     download_button = client.find_element_by_xpath(
         "//*[@id='optionsPage']/div[1]/div[4]/input"
@@ -127,9 +132,13 @@ def crawl(latitude, longitude):
     print(">>> Downloading the image.")
 
 
-def get_landsat_image(latitude, longitude, shapefile_path):
+def get_landsat_image(order, shapefile_path):
     try:
-        crawl(latitude, longitude)
+        order_id = order['id']
+        latitude = order['latitude']
+        longitude = order['longitude']
+
+        crawl(order_id, latitude, longitude)
         try:
             check_zip_download_finished(temp_dir)
             print(">>> Download finished.")
