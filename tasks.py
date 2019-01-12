@@ -4,7 +4,7 @@ from celery import Celery
 from spider import get_landsat_image
 from uploader import get_shapefile
 from settings import TEMP_DIR, BROKER_URL as broker_url
-from config import temp_dir
+from config import logger
 from queries import (
     get_scraping_orders,
     update_scraping_order
@@ -21,7 +21,7 @@ app.conf.update(
 def setup_periodic_tasks(sender, **kwargs):
 
     sender.add_periodic_task(
-        60.0,
+        300.0,
         watch_new_coordinates,
         name='Scrapping Orders'
     )
