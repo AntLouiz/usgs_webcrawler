@@ -90,7 +90,7 @@ def update_scraping_order(key, status='no_result'):
     conn.execute(query_update)
 
 
-def insert_raster_to_order(raster_key, thumbnail_link, order_key):
+def insert_raster_to_order(raster_key, thumbnail_link, download_link, order_key):
     metadata = MetaData(bind=None)
     order_table = Table(
         'core_scrapingorder',
@@ -108,7 +108,8 @@ def insert_raster_to_order(raster_key, thumbnail_link, order_key):
 
     insert_raster = insert(raster_table).values({
         'key': raster_key,
-        'thumbnail_link': thumbnail_link
+        'thumbnail_link': thumbnail_link,
+        'download_link': download_link
     })
 
     conn.execute(insert_raster)

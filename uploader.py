@@ -30,9 +30,16 @@ def upload_file(filename, file_path, order_id):
     file.SetContentFile(file_path)
     file.Upload()
 
+    file.InsertPermission({
+        'type': 'anyone',
+        'value': 'anyone',
+        'role': 'reader'
+    })
+
     insert_raster_to_order(
         file['id'],
         file['thumbnailLink'],
+        file['webContentLink'],
         order_id
     )
 
