@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import update, insert
 from sqlalchemy import MetaData, Table
 from db import conn, engine, session
@@ -109,7 +110,8 @@ def insert_raster_to_order(raster_key, thumbnail_link, download_link, order_key)
     insert_raster = insert(raster_table).values({
         'key': raster_key,
         'thumbnail_link': thumbnail_link,
-        'download_link': download_link
+        'download_link': download_link,
+        'download_date': datetime.now()
     })
 
     conn.execute(insert_raster)
