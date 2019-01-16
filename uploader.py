@@ -3,6 +3,7 @@ from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from config import temp_dir
 from decompressor import decompress_zip_file
+from queries import insert_raster_to_order
 
 
 gauth = GoogleAuth()
@@ -12,7 +13,7 @@ gauth.LocalWebserverAuth()
 drive = GoogleDrive(gauth)
 
 
-def upload_file(filename, file_path):
+def upload_file(filename, file_path, order_id):
     f_list = drive.ListFile({
         'q': "'root' in parents and trashed=false"
     }).GetList()
@@ -28,6 +29,13 @@ def upload_file(filename, file_path):
 
     file.SetContentFile(file_path)
     file.Upload()
+
+    insert_raster_to_order(
+        file['id'],
+        file['thumbnailLink'],
+        order_id
+    )
+
     os.remove(file_path)
 
 
