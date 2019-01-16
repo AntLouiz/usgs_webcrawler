@@ -170,7 +170,8 @@ def execute_scraping_order(order, shapefile_path):
     print(">>> Uploading the file.")
     upload_file(
         upload_filename,
-        upload_file_path
+        upload_file_path,
+        order_id
     )
 
     clean_dir(temp_dir)
