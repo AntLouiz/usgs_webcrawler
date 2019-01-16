@@ -1,4 +1,4 @@
-from sqlalchemy import update
+from sqlalchemy import update, insert
 from sqlalchemy import MetaData, Table
 from db import conn, engine, session
 
@@ -85,6 +85,44 @@ def update_scraping_order(key, status='no_result'):
         scrapingorder_table.c.key == key
     ).values(
         status=status
+    )
+
+    conn.execute(query_update)
+
+
+def insert_raster_to_order(raster_key, thumbnail_link, order_key):
+    metadata = MetaData(bind=None)
+    order_table = Table(
+        'core_scrapingorder',
+        metadata,
+        autoload=True,
+        autoload_with=engine
+    )
+
+    raster_table = Table(
+        'core_raster',
+        metadata,
+        autoload=True,
+        autoload_with=engine
+    )
+
+    insert_raster = insert(raster_table).values({
+        'key': raster_key,
+        'thumbnail_link': thumbnail_link
+    })
+
+    conn.execute(insert_raster)
+
+    new_raster = session.query(raster_table).filter(
+        raster_table.c.key == raster_key
+    ).one()
+
+    query_update = update(
+        order_table
+    ).where(
+        order_table.c.key == order_key
+    ).values(
+        raster_id=new_raster[0]
     )
 
     conn.execute(query_update)
