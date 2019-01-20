@@ -45,7 +45,8 @@ def get_scraping_orders():
         'scrapping_coord_id': ScrapingOrder.c.coordinates_id,
         'coordinate_id': Coordinates.c.id,
         'coord_shape_id': Coordinates.c.shapefile_id,
-        'shapefile_id': Shapefiles.c.id
+        'shapefile_id': Shapefiles.c.id,
+        'is_active': ScrapingOrder.c.is_active
     }
 
     query_results = session.query(
@@ -56,6 +57,8 @@ def get_scraping_orders():
         filter_fields['coord_shape_id'] == filter_fields['shapefile_id']
     ).filter(
         query_fields['status'] == 'waiting'
+    ).filter(
+        filter_fields['is_active'] == True
     ).all()
 
     results = []
@@ -111,7 +114,8 @@ def insert_raster_to_order(raster_key, thumbnail_link, download_link, order_key)
         'key': raster_key,
         'thumbnail_link': thumbnail_link,
         'download_link': download_link,
-        'download_date': datetime.now()
+        'download_date': datetime.now(),
+        'is_active': True
     })
 
     conn.execute(insert_raster)
