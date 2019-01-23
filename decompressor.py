@@ -15,8 +15,6 @@ def decompress_zip_file(file_path, output_dir='./'):
     with zipfile.ZipFile(file_path, 'r') as zip_ref:
         zip_ref.extractall(output_dir)
 
-    os.remove(file_path)
-
 
 def clean_file(file_path, output_dir='./'):
     decompress_zip_file(file_path, output_dir)

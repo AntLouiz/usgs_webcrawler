@@ -78,11 +78,12 @@ def get_shapefile(user_id, download_dir=temp_dir):
                 file_id,
                 file_ext
             )
+            output_dir = os.path.join(temp_dir, user_id)
             shapefile = drive.CreateFile({'id': file_id})
 
             shapefile.GetContentFile(file_path)
 
             decompress_zip_file(
                 file_path,
-                temp_dir
+                output_dir
             )

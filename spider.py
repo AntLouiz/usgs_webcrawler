@@ -174,7 +174,5 @@ def execute_scraping_order(order, shapefile_path):
         order_id
     )
 
-    clean_dir(temp_dir)
-    clean_dir(download_dir)
 
     print(">>> Finished.")

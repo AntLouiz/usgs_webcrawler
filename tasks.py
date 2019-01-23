@@ -1,6 +1,8 @@
 import glob
-import config
+import os.path
+from config import temp_dir
 from celery import Celery
+from celery.utils.log import get_task_logger
 from spider import execute_scraping_order
 from uploader import get_shapefile
 from settings import TEMP_DIR, BROKER_URL as broker_url
@@ -10,40 +12,21 @@ from queries import (
 )
 
 app = Celery('tasks', broker=broker_url)
-
-app.conf.update(
-    result_expires=3600,
-)
-
-
-@app.on_after_configure.connect
-def setup_periodic_tasks(sender, **kwargs):
-
-    sender.add_periodic_task(
-        300.0,
-        watch_new_coordinates,
-        name='Scrapping Orders'
-    )
-
+logger = get_task_logger(__name__)
 
 @app.task
-def watch_new_coordinates():
-    orders = get_scraping_orders()
+def crawl_order(order):
+    logger.info(order)
+    get_shapefile(
+        order['shapefile_key']
+    )
 
-    if len(orders):
-        for order in orders:
-            print(order)
-            get_shapefile(
-                order['shapefile_key']
-            )
+    shapefile_dir = os.path.join(temp_dir, order['shapefile_key'])
+    shapefile_path = glob.glob("{}/*.shp".format(shapefile_dir))[0]
+    execute_scraping_order(
+        order,
+        shapefile_path
+    )
 
-            shapefile_path = glob.glob("./{}*.shp".format(TEMP_DIR))[0]
+    update_scraping_order(order['id'], status='finished')
 
-            execute_scraping_order(
-                order,
-                shapefile_path
-            )
-
-            update_scraping_order(order['id'], status='finished')
-    else:
-        print("No orders founded.")
